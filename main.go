@@ -58,7 +58,6 @@ func removeDuplicates(foundVideos []string) []string {
 }
 
 func buildUrl(tag string) string {
-	fmt.Println(tag)
 	return "https://us.tiktok.com/api/topic/item_list/" +
 		"?aid=1988&" +
 		"app_language=en&" +
