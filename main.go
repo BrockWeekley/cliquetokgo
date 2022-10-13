@@ -32,7 +32,6 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		CheckForError(err)
-		fmt.Println(string(bodyBytes))
 		setWriter(w)
 		videoUrls := filterVideos(string(bodyBytes))
 		CheckForError(json.NewEncoder(w).Encode(videoUrls))
