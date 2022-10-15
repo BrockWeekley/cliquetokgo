@@ -16,7 +16,7 @@ func main() {
 func StartServer() {
 	apiServerMux := http.NewServeMux()
 	apiServer := http.Server{
-		Addr:    fmt.Sprintf(":%v", 5000),
+		Addr:    fmt.Sprintf(":%v", 5001),
 		Handler: apiServerMux,
 	}
 	apiServerMux.HandleFunc("/api/v2", handler)
@@ -25,17 +25,25 @@ func StartServer() {
 }
 
 func getVideos(w http.ResponseWriter, r *http.Request) {
+	setWriter(w)
 	url := buildUrl(r.URL.Query().Get("tag"))
 	resp, err := http.Get(url)
 	CheckForError(err)
 
+	fmt.Println("Response code from TikTok: ")
+	fmt.Println(resp.StatusCode)
+
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		CheckForError(err)
-		setWriter(w)
 		videoUrls := filterVideos(string(bodyBytes))
+		fmt.Println("Size of found video urls: ")
+		fmt.Println(len(videoUrls))
+		fmt.Println("First url in list: ")
+		fmt.Println(videoUrls[0])
 		CheckForError(json.NewEncoder(w).Encode(videoUrls))
 	}
+	w.WriteHeader(resp.StatusCode)
 }
 
 func filterVideos(body string) []string {
@@ -58,6 +66,8 @@ func removeDuplicates(foundVideos []string) []string {
 }
 
 func buildUrl(tag string) string {
+	fmt.Println("Received a new request with tag: ")
+	fmt.Println(tag)
 	return "https://us.tiktok.com/api/topic/item_list/" +
 		"?aid=1988&" +
 		"app_language=en&" +
