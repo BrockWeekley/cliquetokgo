@@ -9,6 +9,10 @@ import (
 	"regexp"
 )
 
+type VideoResponse struct {
+	Urls []string `json:"urls"`
+}
+
 func main() {
 	StartServer()
 }
@@ -32,6 +36,7 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Response code from TikTok: ")
 	fmt.Println(resp.StatusCode)
+	w.WriteHeader(resp.StatusCode)
 
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(resp.Body)
@@ -41,9 +46,10 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(len(videoUrls))
 		fmt.Println("First url in list: ")
 		fmt.Println(videoUrls[0])
-		CheckForError(json.NewEncoder(w).Encode(videoUrls))
+		response := VideoResponse{Urls: videoUrls}
+		fmt.Println(response.Urls)
+		CheckForError(json.NewEncoder(w).Encode(response))
 	}
-	w.WriteHeader(resp.StatusCode)
 }
 
 func filterVideos(body string) []string {
